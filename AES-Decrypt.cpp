@@ -201,7 +201,7 @@ int main(){
 	scanf("%s",&filename);
 	password = fopen(filename,"rb");
 	
-	for (int i=0;i<16;i++){
+	for (int i=0;i<nk;i++){
         CipherKey[i] = fgetc(password);
         block [i] = (unsigned char) CipherKey[i];
     }
@@ -216,7 +216,7 @@ int main(){
 	ot = fopen("outout.txt","wb");
 	int ROUND=0;
 	while(!feof(in)){
-		printf("Descrypt Round [%d] : ",++ROUND);
+		
 		unsigned char InputCipher[16];
 		int temp;
 		for (int i=0;i<16;i++){
@@ -228,6 +228,7 @@ int main(){
 			}
 	    }
 	    if(temp-1==0) break;
+	    printf("Descrypt Round [%d] : ",++ROUND);
 	    int round = nr;
 	    for(int i=0;i<4;i++){
 			for(int j=0;j<4;j++){

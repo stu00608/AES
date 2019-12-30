@@ -178,8 +178,7 @@ int main(){
 	
 	cypher=fopen("cypher.txt","r");//only for txtmode
 	unsigned char itext[16];
-	unsigned char ctext[16];
-	int key[16];
+	
 	srand(time(NULL));
 	printf("select AES type: AES-128 / AES-192 / AES-256 => AES-");
 	scanf("%d", &AESOption);
@@ -188,6 +187,9 @@ int main(){
 	nr = AESOption / 32 + 6;
 		printf("select mode: (1) random key / (2) custom key / (3) debug mode / (4)txt mode => ");
 	scanf("%d", &ModeOption);
+	
+	unsigned char ctext[nk];
+	int key[nk];
 	
 	if (ModeOption == 2){
 		printf("AES-%d mode: enter %d words =>", AESOption, AESOption / 8);
@@ -208,7 +210,6 @@ int main(){
 		else	
 			ctext[i]='0';
 			
-		
 		}
 		for(int i=0;i<AESOption / 8;i++){
 			CipherKey [i] = ctext[i];
