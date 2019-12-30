@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h> 
 
-unsigned char block [32], ExpandKey [240], CurrentKey[4], InputCipher[32], CipherKey [32], state[4][4], out[16];
+unsigned char block [32], ExpandKey [240], CurrentKey[4], CipherKey [32], state[4][4], out[16];
 char plainText[128];
 int Rcon = 1, nk, nr, RKeyNum = 4, AESOption, ModeOption;
 
@@ -206,47 +206,60 @@ int main(){
         block [i] = (unsigned char) CipherKey[i];
     }
 	memcpy(ExpandKey, block, sizeof(block));
+	
 	KeyExpansion();
 	
 	printf("CipherText File Name : ");
 	scanf("%s",filename);
-	in = fopen(filename,"rb");
 	
-	for (int i=0;i<16;i++){
-        InputCipher[i] = fgetc(in);
-    }
-    
-    
-    int round = nr;
-    for(int i=0;i<4;i++){
-		for(int j=0;j<4;j++){
-			state[j][i] = InputCipher[i*4+j];
+	in = fopen(filename,"rb");
+	ot = fopen("outout.txt","wb");
+	int ROUND=0;
+	while(!feof(in)){
+		printf("Descrypt Round [%d] : ",++ROUND);
+		unsigned char InputCipher[16];
+		int temp;
+		for (int i=0;i<16;i++){
+			if(!feof(in)){
+				InputCipher[i] = fgetc(in);
+			}else{
+				temp=i;
+				break;
+			}
+	    }
+	    if(temp-1==0) break;
+	    int round = nr;
+	    for(int i=0;i<4;i++){
+			for(int j=0;j<4;j++){
+				state[j][i] = InputCipher[i*4+j];
+			}
 		}
+	
+	    AddRoundKey(nr);
+	
+	    
+	    for (round=nr-1;round>0;round--){
+	        ShiftRows_Inv();
+	        SubBytes_Inv();
+	        AddRoundKey(round);
+	        MixColumns_Inv();
+	    }
+	    
+	    ShiftRows_Inv();
+	    SubBytes_Inv();
+	    AddRoundKey(0);
+	    
+	    for(int i = 0;i < 4;i++) 
+	        for(int j = 0;j < 4;j++)
+	            out[i * 4 + j]=state[j][i];
+	    
+	    
+	    for(int i=0;i<16;i++){
+	    	fprintf(ot,"%c",out[i]);
+	    	printf("%c",out[i]);
+		}
+		printf("\n");
 	}
-
-    AddRoundKey(nr);
-
-    
-    for (round=nr-1;round>0;round--){
-        ShiftRows_Inv();
-        SubBytes_Inv();
-        AddRoundKey(round);
-        MixColumns_Inv();
-    }
-    
-    ShiftRows_Inv();
-    SubBytes_Inv();
-    AddRoundKey(0);
-    
-    for(int i = 0;i < 4;i++) 
-        for(int j = 0;j < 4;j++)
-            out[i * 4 + j]=state[j][i];
-    
-    ot = fopen("outout.txt","wb");
-    for(int i=0;i<16;i++){
-    	fprintf(ot,"%c",out[i]);
-	}
-    
 	return 0;
 }
 
